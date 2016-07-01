@@ -35,10 +35,11 @@ def ExtractMemberIdsFromFiles(path_to_dir):
   results = os.popen('ls %s' % path_to_dir)
   paths = [row.strip('\n') for row in results]
   
-  with open(path, 'r') as f:
-    for row in f:
-      for re_groups in re.findall(r'(<a href="\/members\/)([\w]+)(\/">)', row):
-        member_ids.append(re_groups[1])
+  for path in paths:
+    with open(path, 'r') as f:
+      for row in f:
+        for re_groups in re.findall(r'(<a href="\/members\/)([\w]+)(\/">)', row):
+          member_ids.append(re_groups[1])
 
   return members_ids
   
