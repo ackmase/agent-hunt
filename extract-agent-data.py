@@ -9,6 +9,7 @@ import urllib
 AGENT_ID_KEY = 'AgentIds'
 AGENT_NAME_KEY = 'AgentName'
 AGENT_URL_KEY = 'AgentUrl'
+PICTURE_BOOK_KEY = 'PictureBook'
 
 AGENT_FILE_NAME = '%s.html'
 AGENT_IDS_FILE_NAME = 'agents.csv'
@@ -37,11 +38,14 @@ class Agent(object):
       for row in f:
         for re_groups in re.findall(r'(<title>Publishers Marketplace: )([\w.,\-&\'\s]+)(<\/title>)', row):
           self.agent_name = re_groups[1]
+        if 'picture book' in row.lower():
+          self.picture_books = True
           
   def ToDict(self):
     return {AGENT_NAME_KEY: self.agent_name,
             AGENT_ID_KEY: self.agent_id,
-            AGENT_URL_KEY: self.agent_url}
+            AGENT_URL_KEY: self.agent_url,
+            PICTURE_BOOK_KEY: self.picture_books}
             
           
 def GetAgentIdsFromCsv(path_to_dir):
