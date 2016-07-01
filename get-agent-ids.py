@@ -4,7 +4,9 @@ import sys
 import time
 import urllib
 
-FILE_NAME = '%s_%s.html'
+MEMBER_FILE_NAME = '%s.html'
+MEMBER_URL = 'http://www.publishersmarketplace.com/members/%s/'
+QUERY_FILE_NAME = '%s_%s.html'
 QUERY_URL = 'http://www.publishersmarketplace.com/pm/search?ss_p=%s&ss_q=%s&ss_c=memberpage'
 MAX_PAGES = 15
 
@@ -18,7 +20,7 @@ def DownloadQueryPages(query_string, path_to_dir):
   formatted_query_string = '+'.join(query_string.split())
   for page_index in range(1, MAX_PAGES + 1):
     url = QUERY_URL % (str(page_index), formatted_query_string)
-    file_path = os.path.join(path_to_dir, FILE_NAME % (formatted_query_string, page_index))
+    file_path = os.path.join(path_to_dir, QUERY_FILE_NAME % (formatted_query_string, page_index))
     time.sleep(1)
     urllib.urlretrieve(url, file_path)
 
@@ -47,6 +49,29 @@ def ExtractMemberIdsFromFiles(path_to_dir):
   return member_ids
   
   
+def IsAgent(member_id, path_to_dir):
+  """Checks whether the member is an agent.
+  
+  Args:
+    member_id: str, member ID.
+    path_to_dir: str, path to directory to save files.
+    
+  Returns:
+    Boolean.
+  """
+  url = MEMBER_URL % member_id
+  file_path = os.path.join(path_to_dir, MEMBER_FILE_NAME % member_id)
+  time.sleep(1)
+  urllib.urlretrieve(url, file_path)
+  
+  with open(file_path, 'r') as f:
+    for row in f:
+      if re.search(r'agent : <a href="mailto:', row):
+        return True
+    
+  return False
+  
+  
 def main():
   if len(sys.argv) != 4:
     print 'usage: python get-member-ids.py "query string" /path/to/dir download?'
@@ -58,8 +83,12 @@ def main():
   if download:
     DownloadQueryPages(query_string, path_to_dir)
     
-  for member_id in ExtractMemberIdsFromFiles(path_to_dir):
-    print member_id
+  agent_ids = [member_id for member_id in ExtractMemberIdsFromFiles(path_to_dir)
+               if IsAgent(member_id, path_to_dir)]
+  
+  for agent_id in agent_ids:
+    print agent_id
+    
 
 if __name__ == '__main__':
   main()
