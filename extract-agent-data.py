@@ -6,6 +6,7 @@ import time
 import urllib
 
 
+AGENCY_KEY = 'Agency'
 AGENT_ID_KEY = 'AgentIds'
 AGENT_NAME_KEY = 'AgentName'
 AGENT_URL_KEY = 'AgentUrl'
@@ -42,9 +43,9 @@ class Agent(object):
     self.agent_url = AGENT_URL % agent_id
     self.agent_name = None
     self.picture_books = False
+    self.agency = None
     
     # Following variables are stubs and aren't currently extracted.
-    self.agency = None
     self.website_url = None
     
   def ExtractData(self):
@@ -60,6 +61,12 @@ class Agent(object):
         for re_groups in re.findall(r'(<title>Publishers Marketplace: )([\w.,\-&\'\s]+)(<\/title>)', row):
           self.agent_name = re_groups[1]
           
+        # Extract agency.
+        for re_groups in re.findall(r'(<tr height="20"><td colspan="8" height="20" class="line2"'
+                                     ' valign="bottom" nowrap><nobr>)([\w.,\-&\'\s]+)'
+                                     '(</nobr></td></tr>)', row):
+          self.agency = re_groups[1]
+          
         # Check if the agent might be interested in picture books.
         if 'picture book' in row.lower():
           self.picture_books = True
@@ -69,7 +76,8 @@ class Agent(object):
     return {AGENT_NAME_KEY: self.agent_name,
             AGENT_ID_KEY: self.agent_id,
             AGENT_URL_KEY: self.agent_url,
-            PICTURE_BOOK_KEY: self.picture_books}
+            PICTURE_BOOK_KEY: self.picture_books,
+            AGENCY_KEY: self.agency}
             
           
 def GetAgentIdsFromCsv(path_to_dir):
