@@ -66,6 +66,9 @@ class Agent(object):
                                      ' valign="bottom" nowrap><nobr>)([\w.,\-&\'\s]+)'
                                      '(</nobr></td></tr>)', row):
           self.agency = re_groups[1]
+        if not self.agency:
+          for re_groups in re.findall(r'([\w.,\-&\'\s]+)(<br>)', row):
+            self.agency = re_groups[0]
           
         # Check if the agent might be interested in picture books.
         if 'picture book' in row.lower():
