@@ -1,3 +1,8 @@
+"""Tool for grabbing agent IDs and pages from publishers marketplace.
+
+Query is typically just something like 'agent'.
+"""
+
 import os
 import re
 import sys
